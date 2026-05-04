@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ORI Extended — Compagnon d'Orientation Intelligent | L'Étudiant</title>
+    <meta name="description" content="ORI, le compagnon d'orientation IA de L'Étudiant. Orientation personnalisée, vie étudiante, logement, bourses — guidé par le contenu éditorial L'Étudiant." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/styles/widget.css" />
+</head>
+<body>
+    <!-- Demo host page simulating a L'Étudiant article -->
+    <div id="demo-host-page">
+        <header class="demo-header">
+            <div class="demo-header-inner">
+                <div class="demo-logo">
+                    <svg viewBox="0 0 180 40" width="160" height="36">
+                        <text x="0" y="30" font-family="'Inter', sans-serif" font-weight="800" font-size="28" fill="#E71336">l'Étudiant</text>
+                    </svg>
+                </div>
+                <nav class="demo-nav">
+                    <a href="#">Orientation</a>
+                    <a href="#">Formations</a>
+                    <a href="#">Vie étudiante</a>
+                    <a href="#">Classements</a>
+                    <a href="#">Emploi</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="demo-content">
+            <div class="demo-article">
+                <div class="demo-breadcrumb">Accueil › Orientation › Choisir sa formation</div>
+                <h1>Comment choisir sa formation post-bac en 2026 ?</h1>
+                <p class="demo-meta">Publié le 15/04/2026 — Mis à jour le 01/05/2026</p>
+                <div class="demo-body">
+                    <p>Choisir son orientation post-bac est une étape cruciale. Entre les différentes filières, les écoles spécialisées et l'université, les options sont nombreuses. L'Étudiant vous accompagne dans cette réflexion avec des outils personnalisés.</p>
+                    <p>Depuis la réforme du bac, le choix des spécialités influence directement les possibilités d'orientation. Il est important de bien comprendre les attendus de chaque formation et d'anticiper les procédures d'admission sur Parcoursup.</p>
+                    <div class="demo-cta-box">
+                        <h3>🤖 Besoin d'aide pour t'orienter ?</h3>
+                        <p>ORI, notre assistant IA, est là pour t'accompagner. Clique sur le bouton en bas à droite pour démarrer !</p>
+                    </div>
+                    <p>Parmi les formations les plus demandées, on retrouve les licences universitaires, les BTS, les BUT (anciennement DUT), les classes préparatoires et les écoles post-bac. Chaque parcours a ses spécificités et ses débouchés.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ORI Widget — injected via JS -->
+    <div id="ori-widget-root"></div>
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
