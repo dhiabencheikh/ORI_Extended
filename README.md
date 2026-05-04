@@ -104,4 +104,4 @@ ori-companion/
 
 ## Team
 
-Albert School — Group 1 — B3 & MSc 1 Business Deep Dive
+Albert School — Group 1 — MSc 1 Business Deep Dive
