@@ -315,8 +315,9 @@ class DecisionEngine:
 
         base += (
             "\nRÈGLES:\n"
+            "- NE RÉPÈTE PAS les informations du profil ou l'historique. Sois direct, factuel et concis.\n"
             "- Chaque réponse DOIT faire avancer l'état (résoudre une incertitude ou en poser une nouvelle).\n"
-            "- NE PAS émettre de recommandation finale. On n'est PAS en phase DECISION.\n"
+            "- Tu peux proposer 1 ou 2 exemples concrets de formations pour illustrer et éviter que l'échange soit trop théorique.\n"
             "- Si l'utilisateur mentionne un critère hors-modèle (conviction, religion, famille), respecte-le comme filtre dur.\n"
             "- Distingue ce que l'utilisateur a dit (fait) de ce que tu infères (hypothèse), et signale l'inférence.\n"
             "- Termine par UNE question précise qui fait avancer vers la décision.\n"
@@ -345,9 +346,10 @@ class DecisionEngine:
             f"CONTRAINTES NON COUVERTES: {', '.join(uncovered)}\n"
             f"{'PROCHAINE QUESTION: ' + next_constraint if next_constraint else 'Toutes couvertes → prépare la transition vers DECISION.'}\n\n"
             f"RÈGLES:\n"
+            f"- NE RÉPÈTE PAS les informations du profil ou l'historique. Sois direct, factuel et concis.\n"
             f"- Réponds à la question de l'utilisateur (utilise l'outil RAG si nécessaire).\n"
-            f"- Intègre la question sur la contrainte manquante dans ta réponse.\n"
-            f"- NE PAS recommander tant que des contraintes sont non couvertes.\n"
+            f"- Intègre la question sur la contrainte manquante dans ta réponse, mais de façon naturelle.\n"
+            f"- Donne des exemples concrets d'écoles ou de formations pour aider l'utilisateur à se projeter.\n"
             f"- Chaque tour doit couvrir AU MOINS une contrainte.\n"
         )
 
@@ -364,6 +366,7 @@ class DecisionEngine:
             f"FILTRES DURS: {hard_filters}\n"
             f"MESSAGE UTILISATEUR: {user_msg}\n\n"
             f"OBJECTIF: Émettre une recommandation finale.\n"
+            f"RÈGLE: NE RÉPÈTE PAS les informations du profil ou l'historique. Sois direct, factuel et concis.\n"
             f"FORMAT OBLIGATOIRE:\n"
             f"- Si UNE option domine → Recommandation unique avec justification point par point + risques.\n"
             f"- Si pas de dominance claire → Shortlist de 2 à 3 maximum, chacune avec son profil distinctif.\n"
@@ -404,16 +407,11 @@ class DecisionEngine:
                 self._log_turn(s, "phase_transition", "AFFINEMENT → RESSERREMENT")
 
         elif phase == Phase.RESSERREMENT:
-            # Transition to DECISION when all constraints are covered
-            all_covered = all(s["constraints_covered"].values())
-            # Or when remaining uncovered constraints can't be resolved by questioning
+            # Transition to DECISION when all high priority constraints are covered or we've had enough turns
             uncovered = [c for c, v in s["constraints_covered"].items() if not v]
-            low_priority_only = all(
-                CONSTRAINT_QUESTIONS.get(c, {}).get("priority") == "LOW"
-                for c in uncovered
-            )
-
-            if all_covered or (low_priority_only and len(s["options_pool"]) >= 1):
+            high_missing = [c for c in uncovered if CONSTRAINT_QUESTIONS.get(c, {}).get("priority") == "HIGH"]
+            
+            if len(high_missing) == 0 or s["turn_count"] >= 5:
                 s["phase"] = Phase.DECISION
                 self._log_turn(s, "phase_transition", "RESSERREMENT → DECISION")
 

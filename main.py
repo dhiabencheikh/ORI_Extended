@@ -215,7 +215,7 @@ async def compare(request: CompareRequest):
     options = [request.option1, request.option2]
     if request.option3:
         options.append(request.option3)
-    comparison = build_comparison(option1=request.option1, option2=request.option2, option3=request.option3, profile=session["profile"])
+    comparison = await build_comparison(option1=request.option1, option2=request.option2, option3=request.option3, profile=session["profile"], agent=agent)
     session_manager.add_comparison(request.session_id, options)
     return {"comparison": comparison, "gamification": session_manager.get_gamification_state(request.session_id)}
 

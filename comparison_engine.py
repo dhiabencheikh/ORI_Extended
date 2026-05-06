@@ -83,7 +83,7 @@ COMPARISON_DATA = {
 }
 
 
-def build_comparison(option1: str, option2: str, option3: str = None, profile: dict = None) -> dict:
+async def build_comparison(option1: str, option2: str, option3: str = None, profile: dict = None, agent = None) -> dict:
     """Build a structured comparison between 2-3 options."""
 
     options = [option1, option2]
@@ -99,21 +99,24 @@ def build_comparison(option1: str, option2: str, option3: str = None, profile: d
                 matched[opt] = data
                 break
 
-    # If we don't have data for an option, create a placeholder
+    # If we don't have data for an option, fetch dynamically
     for opt in options:
         if opt not in matched:
-            matched[opt] = {
-                "full_name": opt,
-                "type": "Formation",
-                "selectivity": "Consulte la fiche L'Étudiant",
-                "location": "—",
-                "cost": "—",
-                "specialties": "—",
-                "career": "—",
-                "international": "—",
-                "student_life": "—",
-                "url": f"https://www.letudiant.fr/recherche?q={opt.replace(' ', '+')}",
-            }
+            if agent and agent.is_available:
+                matched[opt] = await _fetch_dynamic_school_data(opt, agent)
+            else:
+                matched[opt] = {
+                    "full_name": opt,
+                    "type": "Formation",
+                    "selectivity": "Consulte la fiche L'Étudiant",
+                    "location": "—",
+                    "cost": "—",
+                    "specialties": "—",
+                    "career": "—",
+                    "international": "—",
+                    "student_life": "—",
+                    "url": f"https://www.letudiant.fr/etudes/annuaire-enseignement-superieur.html?q={opt.replace(' ', '+')}",
+                }
 
     # Build comparison criteria
     criteria_keys = [
@@ -253,3 +256,49 @@ def _build_recommendation(options: list, matched: dict, profile: dict) -> dict:
             f"s'alignent avec ce que tu recherches."
         ),
     }
+
+
+async def _fetch_dynamic_school_data(school_name: str, agent) -> dict:
+    prompt = f"""Génère une fiche de comparaison structurée pour l'établissement suivant : {school_name}.
+Tu dois extraire ou estimer les informations suivantes au format JSON strictement:
+{{
+    "full_name": "Nom complet de l'école/formation",
+    "type": "Type de formation (ex: Université, Grande école)",
+    "selectivity": "Niveau de sélectivité (ex: Très sélectif, Dossier)",
+    "location": "Ville ou campus principal",
+    "cost": "Coût annuel estimé",
+    "specialties": "2 à 3 spécialités principales",
+    "career": "Débouchés ou secteurs principaux",
+    "international": "Opportunités à l'international",
+    "student_life": "Aperçu de la vie étudiante",
+    "url": "https://www.letudiant.fr/etudes/annuaire-enseignement-superieur.html?q=[NOM DE L'ECOLE SANS ESPACES REMPLACES PAR PLUS]"
+}}
+Si tu n'es pas sûr d'une information, utilise 'Non précisé'. Le JSON doit être valide et ne rien contenir d'autre."""
+
+    try:
+        response = agent._client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.1,
+            max_tokens=400,
+            response_format={ "type": "json_object" }
+        )
+        content = response.choices[0].message.content.strip()
+        data = json.loads(content)
+        # Ensure URL format
+        if "url" not in data or "recherche" in data["url"]:
+            data["url"] = f"https://www.letudiant.fr/etudes/annuaire-enseignement-superieur.html?q={school_name.replace(' ', '+')}"
+        return data
+    except Exception as e:
+        return {
+            "full_name": school_name,
+            "type": "Formation",
+            "selectivity": "Consulte la fiche",
+            "location": "—",
+            "cost": "—",
+            "specialties": "—",
+            "career": "—",
+            "international": "—",
+            "student_life": "—",
+            "url": f"https://www.letudiant.fr/etudes/annuaire-enseignement-superieur.html?q={school_name.replace(' ', '+')}",
+        }

@@ -50,7 +50,10 @@ RÈGLES:
 - "inferred" = ce que tu déduis (ex: "je veux un bon salaire" → {{"ambition_financiere": true}}).
 - "hard_filters" = critères non-négociables (religion, famille, conviction).
 - "options_mentioned" = noms d'écoles ou formations mentionnées par l'utilisateur.
-- "suggested_replies" = Si la réponse ORI pose une question à l'utilisateur, génère EXACTEMENT 3 options de réponse très pertinentes, plausibles et concrètes par rapport à cette question (ex: [{{"label": "Émoji + Texte court", "value": "Phrase complète à envoyer"}}]). Ajoute TOUJOURS {{"label": "✍️ Préciser...", "value": ""}} comme dernière et 4ème option.
+- "suggested_replies" = Si la réponse ORI pose une question à l'utilisateur, génère EXACTEMENT 3 options de réponse très pertinentes.
+  * "label" : Titre court du bouton (1 à 3 mots max + un émoji). Ex: "🔬 Recherche scientifique".
+  * "value" : Le message EXACT qui sera envoyé au bot. DOIT être UNE phrase complète, robuste, factuelle, précise et parfaitement cohérente avec le label. Pas de sentimentalisme, pas de réponse en 1 mot déconnectée. Ex: "Je suis intéressé par les parcours universitaires orientés vers la recherche scientifique."
+  Ajoute TOUJOURS {{"label": "✍️ Préciser...", "value": ""}} comme 4ème option.
 - Retourne UNIQUEMENT le JSON, rien d'autre.
 """
 
